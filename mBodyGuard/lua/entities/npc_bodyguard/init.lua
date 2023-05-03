@@ -4,6 +4,7 @@ AddCSLuaFile("shared.lua")
 include("shared.lua")
 
 util.AddNetworkString("bodyguard_talkingto_npc")
+util.AddNetworkString("bodyguard_request_npc")
 
 
 
@@ -26,9 +27,6 @@ function ENT:Initialize()
 	end
 end
 
-util.AddNetworkString("bodyguard_talkingto_npc")
-util.AddNetworkString("bodyguard_request_npc")
-
 function ENT:AcceptInput(name, activator, caller)
 
 	if name == "Use" and caller:IsPlayer() then
@@ -37,3 +35,10 @@ function ENT:AcceptInput(name, activator, caller)
 		net.Send(caller)
 	end
 end
+
+net.Receive("bodyguard_request_npc", function(len, ply)
+    if IsValid(ply) and ply:IsPlayer() then
+        local bodyguard = net.ReadString()
+        print(ply:Name() .. " has requested a bodyguard" .. bodyguard)
+    end
+end)
