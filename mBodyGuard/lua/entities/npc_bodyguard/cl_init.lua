@@ -117,7 +117,7 @@ net.Receive("bodyguard_talkingto_npc", function()
 		local hireinfo = vgui.Create("DButton", MdlPanel) -- Set mdlPanel as the parent
 		hireinfo:Dock(BOTTOM) -- Dock to the top of the mdlPanel
 		hireinfo:SetText("")
-		hireinfo:SetTall(15)
+		hireinfo:SetTall(20)
 		local text = v:GetName()
 		hireinfo.Paint = function(self, w, h)
 		surface.SetDrawColor(25, 25, 25, 255)
@@ -131,6 +131,23 @@ net.Receive("bodyguard_talkingto_npc", function()
 		surface.DrawText(text)
 		end
 
+		local guardinfo = vgui.Create("DButton", hirepanel) -- Set mdlPanel as the parent
+		guardinfo:Dock(FILL) -- Dock to the top of the mdlPanel
+		guardinfo:SetText("")
+		guardinfo:SetTall(20)
+		
+		local text = v:GetName() .. " - Health: " .. v:Health()
+		guardinfo.Paint = function(self, w, h)
+		surface.SetDrawColor(25, 25, 25, 255)
+		surface.DrawRect(0, 0, w, h)
+		surface.SetDrawColor(0, 0, 0)
+		surface.DrawOutlinedRect(0, 0, w, h)
+		surface.SetFont("GuardSystem.Small")
+		local tw, th = surface.GetTextSize(text)
+		surface.SetTextColor(255, 255, 255, 255)
+		surface.SetTextPos(w / 2 - tw / 2, h / 2 - th / 2)
+		surface.DrawText(text)
+		end
 
 		local hirebuy = vgui.Create("DButton", hirepanel) -- Created after hireinfo 
 		hirebuy:Dock(RIGHT)
@@ -138,6 +155,7 @@ net.Receive("bodyguard_talkingto_npc", function()
 		hirebuy:SetTall(25)
 		hirebuy:SetWide(100)
 		local text = "BUY"
+
 		hirebuy.Paint = function(self, w, h)
 			surface.SetDrawColor(135, 206, 250, 255)
 			surface.DrawRect(0, 0, w, h)
@@ -149,7 +167,6 @@ net.Receive("bodyguard_talkingto_npc", function()
 			surface.SetTextPos(w / 2 - tw / 2, h / 2 - th / 2)
 			surface.DrawText(text)
 		end
-		
 
 		local icon = vgui.Create("DModelPanel", MdlPanel)
 		icon:Dock(FILL)
@@ -167,7 +184,6 @@ net.Receive("bodyguard_talkingto_npc", function()
 			icon:SetLookAt(eyepos)
 			icon:SetCamPos(eyepos + Vector(15, 0, -2))
 		end
-
 		
 	end
 
