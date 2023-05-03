@@ -9,7 +9,7 @@ util.AddNetworkString("bodyguard_talkingto_npc")
 
 function ENT:Initialize()
 
-	self:SetModel("models/mossman.mdl")
+	self:SetModel("models/Combine_Soldier.mdl")
 	self:SetMoveType( MOVETYPE_STEP )
 	self:SetSolid( SOLID_BBOX )
 	self:SetUseType( SIMPLE_USE )
@@ -27,6 +27,7 @@ function ENT:Initialize()
 end
 
 util.AddNetworkString("bodyguard_talkingto_npc")
+util.AddNetworkString("bodyguard_request_npc")
 
 function ENT:AcceptInput(name, activator, caller)
 
