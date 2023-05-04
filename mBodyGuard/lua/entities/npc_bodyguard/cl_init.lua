@@ -60,7 +60,6 @@ end
 net.Receive("bodyguard_talkingto_npc", function()
 
     local pl = net.ReadEntity()
-
     
     local Frame = vgui.Create( "DFrame" )
     Frame:SetPos( ScrW()/2 - Frame:GetWide()/2, 50 )
@@ -86,6 +85,7 @@ net.Receive("bodyguard_talkingto_npc", function()
 
     local DScrollPanel = vgui.Create("DScrollPanel", Panel)
     DScrollPanel:Dock(FILL)
+	
 
 	for k, v in pairs(player.GetAll()) do
 		if v:Team() != TEAM_BODYGUARD then
@@ -210,9 +210,14 @@ net.Receive("bodyguard_talkingto_npc", function()
 			icon:SetLookAt(eyepos)
 			icon:SetCamPos(eyepos + Vector(15, 0, -2))
 		end
-		
+
+
 	end
+
+
 
 	
 end)
+
+
 

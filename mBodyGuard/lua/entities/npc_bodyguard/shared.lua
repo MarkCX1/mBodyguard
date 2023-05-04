@@ -3,3 +3,4 @@ ENT.Type = "ai"
 ENT.PrintName = "Bodyguard NPC"
 ENT.Category = "mBodyguard"
 ENT.Spawnable = true
+

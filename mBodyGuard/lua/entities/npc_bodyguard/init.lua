@@ -39,6 +39,9 @@ end
 net.Receive("bodyguard_request_npc", function(len, ply)
     if IsValid(ply) and ply:IsPlayer() then
         local bodyguard = net.ReadString()
-        print(ply:Name() .. " has requested a bodyguard" .. bodyguard)
+        print(ply:Name() .. " has requested a bodyguard '" .. bodyguard .. "' ")
+		print(bodyguard,ply)
     end
 end)
+
+
