@@ -170,15 +170,51 @@ net.Receive("bodyguard_talkingto_npc", function()
 			surface.DrawText(text)
 		end
 
+		local selectedGuard
+		local hiredGuards = {} -- table to store the names of hired bodyguards
+
+
+		-- function to add a hired bodyguard to the table
+		local function addHiredGuard(name)
+			hiredGuards[name] = true
+		end
+
+		-- function to check if a bodyguard is hired
+		local function isHired(name)
+			return hiredGuards[name] ~= nil
+		end
+
 		hirebuy.DoClick = function()
 			selectedGuard = v:GetName() -- Set selectedGuard to the guard
 			if not selectedGuard then return end 
 			print("Buying guard: " .. selectedGuard)
 			net.Start("bodyguard_request_npc")
-			net.WriteString(selectedGuard) -- send the selectedGuard  to the server
+			net.WriteString(selectedGuard) -- send the selectedGuard to the server
 			net.SendToServer()
+			addHiredGuard(selectedGuard) -- add the hired bodyguard to the table
+			
 			Frame:Close()
 		end
+
+		-- callback function for the net message that informs the client when a bodyguard has been hired
+		net.Receive("bodyguard_hired", function()
+			local name = net.ReadString()
+			addHiredGuard(name)
+		end)
+
+		-- HUDPaint hook function
+		hook.Add("HUDPaint", "DrawPlayerESP", function()
+		    local ESP_COLOR = Color(255, 0, 0) -- Red
+    		local ESP_RADIUS = 100
+			for _, ply in ipairs(player.GetAll()) do
+				if ply:Team() == TEAM_BODYGUARD and isHired(ply:GetName()) then -- Only draw the ESP circle for hired bodyguards
+					local pos = ply:GetPos():ToScreen()
+					surface.SetDrawColor(ESP_COLOR)
+					surface.DrawCircle(pos.x, pos.y, ESP_RADIUS, ESP_COLOR)
+				end
+			end
+		end)
+
 
 
 
@@ -218,6 +254,5 @@ net.Receive("bodyguard_talkingto_npc", function()
 
 	
 end)
-
 
 
