@@ -1,13 +1,14 @@
+
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
+AddCSLuaFile("cl_bg_hooks.lua")
 
 include("shared.lua")
+
 
 util.AddNetworkString("bodyguard_talkingto_npc")
 util.AddNetworkString("bodyguard_request_npc")
 util.AddNetworkString("bodyguard_hired")
-
-
 
 function ENT:Initialize()
 
@@ -42,15 +43,11 @@ net.Receive("bodyguard_request_npc", function(len, ply)
         local bodyguard = net.ReadString()
         print(ply:Name() .. " has requested a bodyguard '" .. bodyguard .. "' ")
         print(bodyguard,ply)
-
-        -- code to spawn the bodyguard goes here
-
         -- inform the client that a bodyguard has been hired
         net.Start("bodyguard_hired")
         net.WriteString(bodyguard)
         net.Send(ply)
     end
 end)
-
 
 
