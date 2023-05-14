@@ -22,7 +22,8 @@ surface.CreateFont("GuardSystem.Small", {
     weight = 1000
 })
 
-local nextDistCheck = CurTime() + 1
+local nextDistCheck = CurTime() + 2
+
 
 function ENT:Draw()
     self:DrawModel()
@@ -57,22 +58,22 @@ function ENT:Draw()
     end
 end
 
-local function spawnBotLoop()
-    -- Code to spawn a bot goes here
-    print("Bot spawned!")
-    timer.Simple(10, spawnBotLoop) -- Spawn a new bot after 10 seconds
-end
-
--- Bind the loop to the F5 key
-hook.Add("PlayerBindPress", "SpawnBotLoopBind", function(ply, bind, pressed)
-    if bind == "f5" and pressed then
-        spawnBotLoop()
-        return true -- Return true to prevent the bind from doing its default action
-    end
-end)
-
-
 net.Receive("bodyguard_talkingto_npc", function()
+
+	local selectedGuard
+	local hiredGuards = {} -- table to store the names of hired bodyguards
+
+
+	-- ADD BODYGUARD TO TABLE
+	local function addHiredGuard(name)
+		hiredGuards[name] = true
+	end
+
+	-- CHECK IF BODYGUARD IS HIRED
+	local function isHired(name)
+		return hiredGuards[name] ~= nil
+	end
+
 
     local pl = net.ReadEntity()
     
@@ -131,25 +132,27 @@ net.Receive("bodyguard_talkingto_npc", function()
 
 		local hireinfo = vgui.Create("DButton", MdlPanel) -- Set mdlPanel as the parent
 		hireinfo:Dock(BOTTOM) -- Dock to the top of the mdlPanel
+		hireinfo:SetMouseInputEnabled(false)
 		hireinfo:SetText("")
 		hireinfo:SetTall(20)
 		local text = v:GetName()
 		hireinfo.Paint = function(self, w, h)
-		surface.SetDrawColor(25, 25, 25, 255)
-		surface.DrawRect(0, 0, w, h)
-		surface.SetDrawColor(0, 0, 0)
-		surface.DrawOutlinedRect(0, 0, w, h)
-		surface.SetFont("GuardSystem.Small")
-		local tw, th = surface.GetTextSize(text)
-		surface.SetTextColor(255, 255, 255, 255)
-		surface.SetTextPos(w / 2 - tw / 2, h / 2 - th / 2)
-		surface.DrawText(text)
+			surface.SetDrawColor(25, 25, 25, 255)
+			surface.DrawRect(0, 0, w, h)
+			surface.SetDrawColor(0, 0, 0)
+			surface.DrawOutlinedRect(0, 0, w, h)
+			surface.SetFont("GuardSystem.Small")
+			local tw, th = surface.GetTextSize(text)
+			surface.SetTextColor(255, 255, 255, 255)
+			surface.SetTextPos(w / 2 - tw / 2, h / 2 - th / 2)
+			surface.DrawText(text)
 		end
 
-		local selectedGuard -- Declare selectedGuard 
+		local selectedGuard -- Declaring selectedGuard 
 
 		local guardinfo = vgui.Create("DButton", hirepanel)
 		guardinfo:Dock(FILL)
+		guardinfo:SetMouseInputEnabled(false)
 		guardinfo:SetText("")
 		guardinfo:SetTall(20)
 
@@ -185,20 +188,6 @@ net.Receive("bodyguard_talkingto_npc", function()
 			surface.DrawText(text)
 		end
 
-		local selectedGuard
-		local hiredGuards = {} -- table to store the names of hired bodyguards
-
-
-		-- function to add a hired bodyguard to the table
-		local function addHiredGuard(name)
-			hiredGuards[name] = true
-		end
-
-		-- function to check if a bodyguard is hired
-		local function isHired(name)
-			return hiredGuards[name] ~= nil
-		end
-
 		hirebuy.DoClick = function()
 			selectedGuard = v:GetName() -- Set selectedGuard to the guard
 			if not selectedGuard then return end 
@@ -217,43 +206,6 @@ net.Receive("bodyguard_talkingto_npc", function()
 			
 			addHiredGuard(name)
 		end)
-
-
-		hook.Add("PostDrawOpaqueRenderables", "DrawPlayerESP", function()
-			local ESP_COLOR = Color(0, 22, 255) -- Blue
-
-			for _, ply in ipairs(player.GetAll()) do
-				if ply:Team() == TEAM_BODYGUARD and isHired(ply:GetName()) then -- Only draw the ESP for hired bodyguards
-					local pos = ply:GetPos()
-
-					-- head
-					pos = pos + Vector(0, 0, 80)
-
-					-- white dot
-					render.SetMaterial(Material("sprites/light_glow02_add_noz"))
-					render.DrawSprite(pos, 100, 100, ESP_COLOR)
-
-					-- Draw text with the distance in meters above the player's head
-					local distance = math.Round(LocalPlayer():GetPos():Distance(ply:GetPos()))
-					local distanceText = distance .. "m"
-					local distanceScale = math.Clamp(distance / 1000, 0.2, 10) -- this check doesnt work for shit
-					cam.Start3D2D(pos + Vector(0, 0, 20), Angle(0, EyeAngles().y - 90, 90), distanceScale)
-					cam.IgnoreZ(true) -- Make the text always visible
-					draw.SimpleText("Guard me!", "DermaLarge", 0, -50, ESP_COLOR, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-					draw.SimpleText(distanceText, "DermaLarge", 0, 0, ESP_COLOR, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-					cam.IgnoreZ(false) -- Revert the setting
-					cam.End3D2D()
-				end
-			end
-		end)
-
-
-
-
-
-
-
-
 
 		hirebuy.Paint = function(self, w, h)
 			surface.SetDrawColor(135, 206, 250, 255)
@@ -285,11 +237,42 @@ net.Receive("bodyguard_talkingto_npc", function()
 		end
 
 
-	end
+		hook.Add("PostDrawOpaqueRenderables", "DrawPlayerESP", function()
+			for _, ply in ipairs(player.GetAll()) do
+				if ply:Team() == TEAM_BODYGUARD and isHired(ply:GetName()) then -- Only draw the ESP for hired bodyguards
+					local pos = ply:GetPos()
+
+					-- chest area
+					pos = pos + Vector(0, 0, 50)
+
+					-- Draw icon with the distance in meters above the player's head
+					local distance = math.Round(LocalPlayer():GetPos():Distance(ply:GetPos()))
+					local distanceText = distance .. "m"
+					local distanceScale = math.Clamp(distance / 1000, 0.2, 10)
+
+					if distance >= BODYGUARD.Config.Waypoint.waypointdraw then
+						cam.Start3D2D(pos + Vector(0, 0, 20), Angle(0, EyeAngles().y - 90, 90), distanceScale)
+						cam.IgnoreZ(true)
+						draw.SimpleText(distanceText, BODYGUARD.Config.Waypoint.distfont, 0, -20, BODYGUARD.Config.Waypoint.drawcolor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+						surface.SetMaterial(Material("icon16/flag_blue.png"))
+						surface.SetDrawColor(BODYGUARD.Config.Waypoint.icondrawcolor)
+						surface.DrawTexturedRect(-16, -4, 32, 32)
+						cam.IgnoreZ(false)
+						cam.End3D2D()
+					end
+
+					-- white dot
+					render.SetMaterial(Material("sprites/light_glow02_add_noz"))
+					render.DrawSprite(pos, 100, 100, BODYGUARD.Config.Waypoint.drawcolor)
+				end
+			end
+		end)
 
 
 
+		
 	
+	end
 end)
 
 

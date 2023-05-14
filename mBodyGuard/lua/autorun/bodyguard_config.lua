@@ -18,4 +18,13 @@ BODYGUARD.Config.Job = {
 
 }
 
+BODYGUARD.Config.Waypoint = {
+    --message = "Guard: ", -- set to "" to disable
+    drawcolor = Color(0,0,222,255), -- set to 0,0,0,0 to disable (WILL HIDE NAME TOO)
+    icondrawcolor = Color(255,255,255,255),
+    waypointdraw = 1000, -- Distance in 'm' you want it to stop drawing at.
+    --namefont = "GuardSystem.Big", -- (Big,Medium,Small) all available fonts.
+    distfont = "GuardSystem.Small" -- (Big,Medium,Small) all available fonts.
+}
+
 print("Loaded bodyguard_config.lua")
